@@ -1,0 +1,4 @@
+youtube.com;{param,hd}.;{v,false}.;<embedded>~1~</embedded>;
+vimeo.com;{slash,hd}.;{{1},false}.;<iframe hd="~2~" src="http://player.vimeo.com/video/~1~" width="500" height="281" frameborder="0"></iframe>;
+flickr.com;{slash,hd}.;{{1,2},true}.;<embedded size="~2~">~1~</embedded>;
+liveleak.com;{param}.;{i}.;<object width="450" height="370"><param name="movie" value="http://www.liveleak.com/e/||1||"></param><param name="wmode" value="transparent"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.liveleak.com/e/||1||" type="application/x-shockwave-flash" wmode="transparent" allowscriptaccess="always" width="450" height="370"></embed></object>
