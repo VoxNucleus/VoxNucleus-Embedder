@@ -4,7 +4,7 @@
 ## Website (2) : http://www.victorkabdebon.net
 ## Website (3) : http://www.voxnucleus.fr
 ## License : GPL
-## State  : not working
+## State  :  working (early beta)
 ## Programming Language : 100% Erlang
 
 ## Dependency : Yaws webserver
@@ -19,10 +19,27 @@ This software relies on the power of yaws server. I invite you to go and do some
 The code is divided into logical units. The different files will be renamed in the future (lack of coherence)
 
 
-# Future improvements
+## Future improvements
 
 - In the future instead of stocking the data into a file, the content of the file will be sent to a database (very probably mnesis since it is included in Erlang) 
 - Add options to remotely add/ delete options
 - Add possibility to see the list of equivalence
 - More advanced Javascript client
 - More robust code (try-catch)
+- Add more compatibility with exotic systems
+
+##Compatibility "out of the box"(more to be added) :
+
+(International)
+-youtube
+-dailymotion
+-vimeo
+-liveleak
+-veoh
+
+(French)
+
+##Incompatible with
+
+(French)
+-Jeuxvideo.com {Thanks guys for the key to  your video at the end of your url...}
