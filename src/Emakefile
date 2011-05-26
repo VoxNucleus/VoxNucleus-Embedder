@@ -1,0 +1,1 @@
+{'*', [{outdir,"../ebin"},{pa,".."},{i, "../include"},{i, "../web-server/yaws/include"}, {warn_format,0},"-debug_info"]}.

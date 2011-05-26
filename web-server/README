@@ -1,0 +1,4 @@
+# BEFORE COMPLAINING THAT IT DOESN'T WORK
+# 
+
+Put yaws server here under the folder /yaws/ otherwise you won't be able to run the embedder !
