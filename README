@@ -1,7 +1,7 @@
-## Embedder v0.1
+## Embedder v0.2
 ## Author : Victor Kabdebon
 ## Website : http://www.victorkabdebon.com 
-## Website (2) : http://www.victorkabdebon.net
+## Website (2) : http://www.victorkabdebon.com
 ## Website (3) : http://www.voxnucleus.fr
 ## License : GPL
 ## State  :  working (early beta)
@@ -9,15 +9,36 @@
 
 ## Dependency : Yaws webserver
 
-# How does it work?
+## How does it work?
 
 embedder-equivalence : this is the file you want to modify to add more options. Warning please respect the format.
 Only this format is accepted :
-key;{params}.;embedded code;NEWLINE
+key;{parameters}.;{defaultvalues};embedded code;NEWLINE
+
+The first of the parameters indicates to the embedder how to find the 
 
 This software relies on the power of yaws server. I invite you to go and do some research on the performance of yaws server.
 The code is divided into logical units. The different files will be renamed in the future (lack of coherence)
 
+## Configuration
+
+#Installation
+
+1. Have erlang installed
+2. Download Yaws Server ( http://yaws.hyber.org/ )
+3. Unzip / put the files in a folder and respect the folder organization
+4. Put yaws server at the root folder of Erlembedder under ./web-server/yaws
+5. If ./ebin/ is empty run make.sh $./make.sh is fine
+6. Launch Erlembedder with start-embedder.sh $./start-embedder.sh
+
+7. Do your own client or use the javascript client and configure apache / yaws etc... according to your client needs
+8. Enjoy
+
+
+#Yaws - Configuration
+
+This is the first you want to modify. By default the server is embedded in the program (and it should be like that) but it uses a port that you can select.
+The configuration of the server is in ./include/embedder.hrl
 
 ## Future improvements
 
@@ -27,20 +48,41 @@ The code is divided into logical units. The different files will be renamed in t
 - More advanced Javascript client
 - More robust code (try-catch)
 - Add more compatibility with exotic systems
+- Share regex instead of compiling it over and over (easy to fix)
+- Add a universall bb-code-like such as : <a href=[website.ext:videoid]></a>
 
 ##Compatibility "out of the box"(more to be added) :
 
 (International)
 -youtube
 -youtu.be
--dailymotion
--vimeo
--liveleak
--veoh
+-dailymotion.com
+-vimeo.com
+-liveleak.com
+-veoh.com
+-clipshack.com
+-zoopy.com
+-openfilm.com
+-megaupload.com
+-metacafe.com
+-funnyordie.com
+-expotv.com
+-engagemedia.org
+
+(Russian)
+-rutube.ru
+
+(Chinese)
+-56.com
+
 
 (French)
 
 ##Incompatible with
 
 (French)
--Jeuxvideo.com {Thanks guys for the key to  your video at the end of your url...}
+-Jeuxvideo.com {Thanks guys for the key to your video at the end of your url...}
+-gamespot.com {raw address because their multiple slashes}
+
+(Belgian)
+http://www.kewego.be/ {Thanks for the nice ".html" after the key to your video, unnecessary at the end of your page...}
