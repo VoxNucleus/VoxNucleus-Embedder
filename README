@@ -11,6 +11,8 @@
 
 ## How does it work?
 
+### WARNING MASTER IS IN V0.2 and v0.2 is in v0.1 (sorry about that)
+
 embedder-equivalence : this is the file you want to modify to add more options. Warning please respect the format.
 Only this format is accepted :
 key;{parameters}.;{defaultvalues};embedded code;NEWLINE
