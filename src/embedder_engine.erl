@@ -28,7 +28,7 @@
 extract_url(URI)->
     {ok,MP}=re:compile(?URIRegex,[]),
     case extract_begin(URI) of
-	URLKeyBegin ->
+	{match,URLKeyBegin} ->
 	    case re:run(string:substr(URI,URLKeyBegin+1),MP,[]) of 
 		{match,[FirstMatch|_]}->
 		    {_,Length}=FirstMatch,
@@ -42,12 +42,14 @@ extract_url(URI)->
    end.
     
 %Find the portion that is before the URL key (http://www.youtube.com) will match "http://www."
+%
+% Output : {match,List}|{nomatch}
 extract_begin(URI)->
     {ok,MP}=re:compile(?URIBegin,[]),
     case re:run(URI,MP,[]) of 
 	{match,[FirstMatch|_]}->
 	    {_,Length}=FirstMatch,
-	    Length;
+	    {match,Length};
 	nomatch->
 	    nomatch
     end.
@@ -77,16 +79,22 @@ find_key(Arguments,DefaultValues,URL,A)->
 
 % 
 % Extract the key from the URI
-% Can either be a slash "/key"
-% or a param "?param=key"
+% Can either be a slash "/key" or a param "?param=key"
+% Output -> Key
+% Throws error when no key is found
+
 extract_key(slash,Place,URI)->
     {ok,MP}=re:compile(?URISlashKeyExtractor,[]),
-    {match,[FirstMatch|_]}=re:run(URI,MP,[]),
-    {_,Length}= FirstMatch,
-    TempURI=string:substr(URI,Length),
-    Tokens=string:tokens(TempURI,"/"),
-    Key=lists:flatten(find_slash(Tokens,tuple_to_list(Place),1)),
-    Key;
+    case re:run(URI,MP,[]) of
+	{math,[FirstMatch|_]}->
+	    {_,Length}= FirstMatch,
+	    TempURI=string:substr(URI,Length),
+	    Tokens=string:tokens(TempURI,"/"),
+	    Key=lists:flatten(find_slash(Tokens,tuple_to_list(Place),1)),
+	    Key;
+	{nomatch}->
+	    throw("Not found")
+    end;
 %Extract the key from the request
 extract_key(param,ParamName,URI) ->
     Pattern=lists:flatten([atom_to_list(ParamName),?ParamExtractor]),
@@ -98,16 +106,16 @@ extract_key(param,ParamName,URI) ->
 	    Key=string:substr(CompleteKey,lists:flatlength([ParamName,"="])+1,
 			      length(CompleteKey));
 	nomatch->
-	    throw("Nothing")
+	    throw("They key cannot be found")
     end.
 
 % 
-% 
+%  
 % 
 find_slash([Token|TokenRest],[Place|Rest],N)->
     if
 	Place==N->
-	    [Token,find_slash(TokenRest,Rest,N+1)];
+	    ["/",Token,find_slash(TokenRest,Rest,N+1)];
 %Else statement
 	true ->
 	    find_slash(TokenRest,Rest,N+1)

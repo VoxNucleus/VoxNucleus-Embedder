@@ -1,41 +1,24 @@
 -module(embedder).
 -author("Victor Kabdebon <victor@victorkabdebon.com>").
 
--export([start/0,stop/0]).
+-export([start/0]).
 -export([insertInLog/2,insertInLog/1]).
 -export([terminate/0]).
--export([init/0]).
 
-%Start function
+%
+% Start embedder (called at the begining)
+%
 start()->
     insertInLog(system,"Starting embedder..."),
-    register(mainProcess,spawn(embedder,init,[])),
+    emb_database:start(),
     embedderserver:start([],[]).
 
-% Stop function
-% Called from the outside
-stop()->
-    mainProcess ! {stop}.
-    %unregister(mainProcess),
-    %insertInLog(system,"Embedder stopped").
-
-% Terminate the program (Including http server) 
+%
+% Terminate the program (Including http server)
+%
 terminate()->
     insertInLog(system,"Stopping embedder..."),
     embedderserver:stop([]).
-
-%
-init()->
-    receive
-	{req,url}->
-	    io:format("New req :");
-	stop ->
-	    terminate()
-    end.
-
-%
-call_embedder({req,Address})->
-    io:format("Request").
 
 % Insert in log
 % For system calls

@@ -8,7 +8,8 @@
 
 
 %
-% Send information to the browser
+% Accessed &  Send information to the browser once algorithm is completed
+%
 out(A)->
     case yaws_api:getvar(A,"from") of
 	undefined->
@@ -25,7 +26,7 @@ out(A)->
     end.
 
 % 
-% Find the informations 
+% Find the informations
 % 
 fetch_infos(From,A)->
     case find_url_key(From,A) of
@@ -39,7 +40,7 @@ fetch_infos(From,A)->
     end.
     
 
-% Not used
+% Not used atm
 find_url_key([])->
     {html,"Required values not found"}.
 %
@@ -48,9 +49,8 @@ find_url_key([])->
 % DefaultValues
 % Code : Code found to be replaced
 find_url_key(From,A) ->
-    ExtractedURL= embedder_engine:extract_url(From),
-    
-    case emb_loadfromfile:open_and_search(ExtractedURL) of
+    ExtractedURL= embedder_engine:extract_url(From),    
+    case emb_database:retrieve(ExtractedURL) of
 	notfound ->
 	    notfound;
 	{KeyInFile,Arguments,DefaultValues,Code} ->

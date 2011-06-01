@@ -1,5 +1,7 @@
 -module(embedderserver).
 -author("Victor Kabdebon <victor@victorkabdebon.com>").
+
+-include("embedder.hrl").
 -include("yaws.hrl").
 
 -behavior(application).
@@ -33,21 +35,22 @@ stop(_State) ->
 %
 start_atom_yaws(Args) ->
     error_logger:info_msg("Starting embedded yaws~n",[]),
-    Id = "yawstest",
-    Debug = true,
+    Id = ?ServerId,
+    Debug = ?ServerDebugMode,
     ok = application:load(yaws),
     ok = application:set_env(yaws, embedded, true),
     ok = application:set_env(yaws, id, Id),
     application:start(yaws),
     DefaultGC = yaws_config:make_default_gconf(Debug, Id),
-    GC = DefaultGC#gconf{logdir="./temp/logs"},
+    GC = DefaultGC#gconf{logdir=?LoggingFolder},
     %add ebin dir
     yaws:mkdir(GC#gconf.logdir),
-    SC = #sconf{port = 4446,
+    SC = #sconf{port = ?ServerPort,
 		servername = "localhost",
 		listen = {0,0,0,0},
 		docroot = "www",
-		appmods =[{"/",embedder_client}]
+		appmods =[{"/request",embedder_client},
+			  {"/verification",emb_verification}]
 	       },
     Result = yaws_api:setconf(GC, [[SC]]),
     error_logger:info_msg("Finished starting embedded yaws~n",[]),
