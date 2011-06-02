@@ -49,7 +49,7 @@ find_url_key([])->
 % DefaultValues
 % Code : Code found to be replaced
 find_url_key(From,A) ->
-    ExtractedURL= embedder_engine:extract_url(From),    
+    ExtractedURL= embedder_engine:extract_url(From),
     case emb_database:retrieve(ExtractedURL) of
 	notfound ->
 	    notfound;

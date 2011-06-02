@@ -86,11 +86,11 @@ find_key(Arguments,DefaultValues,URL,A)->
 extract_key(slash,Place,URI)->
     {ok,MP}=re:compile(?URISlashKeyExtractor,[]),
     case re:run(URI,MP,[]) of
-	{math,[FirstMatch|_]}->
+	{match,[FirstMatch]}->
 	    {_,Length}= FirstMatch,
 	    TempURI=string:substr(URI,Length),
 	    Tokens=string:tokens(TempURI,"/"),
-	    Key=lists:flatten(find_slash(Tokens,tuple_to_list(Place),1)),
+	    Key=lists:flatten(find_slash(Tokens,tuple_to_list(Place),false,1)),
 	    Key;
 	{nomatch}->
 	    throw("Not found")
@@ -110,19 +110,28 @@ extract_key(param,ParamName,URI) ->
     end.
 
 % 
-%  
-% 
-find_slash([Token|TokenRest],[Place|Rest],N)->
+% Find key(s) when it is a slash
+% At the moment the first time a keyis found there is no slash between the two. TODO : Implement a more flexible system
+%
+find_slash([Token|TokenRest],[Place|Rest],Delimiter,N)->
     if
 	Place==N->
-	    ["/",Token,find_slash(TokenRest,Rest,N+1)];
+	    case Delimiter of
+		false->
+		    Delim="",
+		    NextDelimiter="/";
+		Delimiter when is_list(Delimiter)->
+		    Delim=Delimiter,
+		    NextDelimiter=Delimiter
+	    end,
+	    [Delim,Token,find_slash(TokenRest,Rest,NextDelimiter,N+1)];
 %Else statement
 	true ->
-	    find_slash(TokenRest,Rest,N+1)
+	    find_slash(TokenRest,Rest,Delimiter,N+1)
     end;
-find_slash(_,[],_) ->
+find_slash(_,[],_,_) ->
     [];
-find_slash([],_,_) ->
+find_slash([],_,_,_) ->
     [].
     
 
