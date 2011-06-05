@@ -48,7 +48,7 @@ start_atom_yaws(Args) ->
     SC = #sconf{port = ?ServerPort,
 		servername = "localhost",
 		listen = {0,0,0,0},
-		docroot = "www",
+		docroot = "../examples/",
 		appmods =[{"/request",embedder_client},
 			  {"/verification",emb_verification}]
 	       },

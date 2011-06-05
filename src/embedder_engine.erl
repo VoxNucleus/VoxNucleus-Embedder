@@ -86,7 +86,7 @@ find_key(Arguments,DefaultValues,URL,A)->
 extract_key(slash,Place,URI)->
     {ok,MP}=re:compile(?URISlashKeyExtractor,[]),
     case re:run(URI,MP,[]) of
-	{match,[FirstMatch]}->
+	{match,[FirstMatch|RestQueue]}->
 	    {_,Length}= FirstMatch,
 	    TempURI=string:substr(URI,Length),
 	    Tokens=string:tokens(TempURI,"/"),
@@ -127,7 +127,7 @@ find_slash([Token|TokenRest],[Place|Rest],Delimiter,N)->
 	    [Delim,Token,find_slash(TokenRest,Rest,NextDelimiter,N+1)];
 %Else statement
 	true ->
-	    find_slash(TokenRest,Rest,Delimiter,N+1)
+	    find_slash(TokenRest,[Place|Rest],Delimiter,N+1)
     end;
 find_slash(_,[],_,_) ->
     [];
@@ -148,7 +148,7 @@ replace_embedder(Replacement,EmbedderCode)->
 replace_code([{_,ToReplace}|ReplaceRest],EmbedderCode,N)->
     Pattern= build_replace_pattern(N),
     {ok,MP}=re:compile(Pattern,[]),
-    ModifEmbedderCode = re:replace(EmbedderCode,MP,ToReplace,[{return,list}]),
+    ModifEmbedderCode = re:replace(EmbedderCode,MP,ToReplace,[{return,list},global]),
     replace_code(ReplaceRest,ModifEmbedderCode,N+1);
 replace_code([],EmbedderCode,_)->
     EmbedderCode.

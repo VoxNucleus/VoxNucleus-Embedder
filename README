@@ -65,11 +65,13 @@ The configuration of the server is in ./include/embedder.hrl
 -clipshack.com
 -zoopy.com
 -openfilm.com
--megaupload.com
+-megavideo.com
 -metacafe.com
 -funnyordie.com
 -expotv.com
 -engagemedia.org
+-gametrailers.com
+
 
 (Russian)
 -rutube.ru
@@ -79,6 +81,7 @@ The configuration of the server is in ./include/embedder.hrl
 
 
 (French)
+Is there any ?
 
 ##Incompatible with
 
