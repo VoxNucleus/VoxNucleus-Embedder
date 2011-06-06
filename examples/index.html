@@ -2,20 +2,32 @@
   <head>
   <title>VN_Embedder_plugin</title>
   <script type="text/javascript" src="./jquery-1.6.1.min.js"></script>
-  <script type="text/javascript" src="./vn_embedder.js"></script>
+  <script type="text/javascript" src="/embedder-server/vn_embedder.js"></script>
   <script type="text/javascript" >
     $(document).ready(function(){
     $("a.to_emb").vn_embedder({
+    embedder_target_id:"vn_media_player",
     embedder_server:"/embedder-server/"});
     });
   </script>
   </head>
   
   <body>
+
+    <h3>Media player</h3>
+
+
+    <div id="vn_media_player">
+      
+    </div>
     <h1>VN_Embedder_plugin</h1>
     
+    <h2>Not working samples</h2>
+    
+    <a class="to_emb" href="http://www.google.fr/un-lien-non-fonctionnel">Link that does not work</a>
 
-    Sample videos:
+
+    <h2>Sample videos</h2>
 
     <h3>Vimeo :</h3>
     <a class="to_emb" href="vimeo.com/24016343"> link to vimeo </a>
@@ -95,9 +107,13 @@
 
     <h3>collegehumor.com</h3>
 
-    <a class="to_emb" href="http://www.gametrailers.com/video/e3-2011-tomb-raider/714561"> link to gametrailers/a>
+    <a class="to_emb" href="http://www.collegehumor.com/video/6505216/good-night-internet"> link to Collegehumor</a>
+
+    <h3>collegehumor.com</h3>
+
+    <a class="to_emb" href="http://worldstarhiphop.com/videos/video.php?v=wshh55ws4MI63e705K63"> link to Collegehumor</a>
 
 
-
+    
   </body>
 </html>

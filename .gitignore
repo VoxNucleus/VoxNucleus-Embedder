@@ -1,0 +1,5 @@
+#Git ignore file
+#Beam files :
+*.beam
+#Emacs temp files :
+*~

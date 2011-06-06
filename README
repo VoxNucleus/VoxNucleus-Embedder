@@ -42,16 +42,25 @@ The code is divided into logical units. The different files will be renamed in t
 This is the first you want to modify. By default the server is embedded in the program (and it should be like that) but it uses a port that you can select.
 The configuration of the server is in ./include/embedder.hrl
 
+## Features
+
+- Fast and simple association algorithm with no ties to other website's API.
+- Start a separate server: if it crashes it won't affect the rest of the system
+- Premade Javascript client to use on your website. Minimal to no need to change your website.
+- Easy to use and expand system
+
 ## Future improvements
 
 - In the future instead of stocking the data into a file, the content of the file will be sent to a database (very probably mnesis since it is included in Erlang) 
 - Add options to remotely add/ delete options
-- Add possibility to see the list of equivalence
-- More advanced Javascript client
-- More robust code (try-catch)
 - Add more compatibility with exotic systems
-- Share regex instead of compiling it over and over (easy to fix)
 - Add a universall bb-code-like such as : <a href=[website.ext:videoid]></a>
+
+## Known bugs and problems
+
+-Some incompatibilities (listed below)
+-Issues with Yaws dying on windows at startup.
+-When using the "slash" method if you need to consider the last slashed element and there is a parameter (&parameter=something) or id such as (#id) it will fail.
 
 ##Compatibility "out of the box"(more to be added) :
 
@@ -71,7 +80,7 @@ The configuration of the server is in ./include/embedder.hrl
 -expotv.com
 -engagemedia.org
 -gametrailers.com
-
+-Collegehumor.com
 
 (Russian)
 -rutube.ru
