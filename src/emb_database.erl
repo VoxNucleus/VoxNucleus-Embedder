@@ -34,7 +34,7 @@ create()->
 	{aborted,{already_exists,?TableName}} ->
 	    success;
 	{atomic,ok} ->
-	    sucess;
+	    success;
 	_ ->
 	    fail
     end.
