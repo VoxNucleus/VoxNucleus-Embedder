@@ -53,7 +53,7 @@ The configuration of the server is in ./include/embedder.hrl
 
 - Add options to remotely add/ delete options (from the javascript)
 - Add more compatibility with exotic systems
-- Add a universall bbcode-like such as : <a href="[website.ext:videoid;option1:value1;option2:value2]"></a>
+- Add a universall bbcode-like such as : <a vn_emb="[website.ext:videoid;option1:value1;option2:value2]"></a>
 
 ## Known bugs and problems
 
@@ -61,6 +61,7 @@ The configuration of the server is in ./include/embedder.hrl
 -Issues with Yaws dying on windows at startup.
 -When using the "slash" method if you need to consider the last slashed element and there is a parameter (&parameter=something) or id such as (#id) it will fail.
 -When using several links videos (like in the example) when clicking different links it will not close the previous videos.
+- Websites which add things like # in the end of their address or parameters make the embedding process fail (considers the things as part of the key)
 
 ##Compatibility "out of the box"(more to be added)
 

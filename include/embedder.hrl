@@ -10,6 +10,20 @@
 -author("victor.kabdebon@victorkabdebon.net").
 
 %%%%%%%%%%%%%%%%%%%%%%
+% General fields
+
+% Owner of the Erlembedder name
+-define(ErlEmbedderOwner,"Victor Kabdebon").
+
+% Owner of the Erlembedder Website
+-define(ErlEmbedderOwnerWebsite,"http://www.voxnucleus.fr").
+
+% Version of ErlEmbedder
+-define(ErlEmbedderVersion,"v0.3").
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%
 %%% Server configuration
 
 % Accepted values : true|false

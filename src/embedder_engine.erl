@@ -8,6 +8,7 @@
 
 
 -module(embedder_engine).
+-author("Victor Kabdebon").
 
 -export([extract_url/1]).
 -export([find_key/4]).
@@ -15,6 +16,7 @@
 -export([find_param/3]).
 -export([replace_embedder/2]).
 -export([string_to_list/1]).
+-export([get_classification/1]).
 
 -include("embedder.hrl").
 -include("yaws_api.hrl").
@@ -62,13 +64,8 @@ extract_begin(URI)->
 % A : Http Request (Needed ?)
 % Output -> Key to the video
 find_key(Arguments,DefaultValues,URL,A)->
-    {ok,Tokens,_}=erl_scan:string(Arguments),
-    {ok,Term}=erl_parse:parse_term(Tokens),
-    [Whatever|_]=tuple_to_list(Term),
-    {ok,ValTokens,_}=erl_scan:string(DefaultValues),
-    {ok,Values}=erl_parse:parse_term(ValTokens),
-    [Param|_]=tuple_to_list(Values),
-    
+    [Whatever|_]=tuple_to_list(Arguments),
+    [Param|_]=tuple_to_list(DefaultValues),
     case Whatever of
 	slash->
 	    extract_key(slash,Param,URL);
@@ -92,7 +89,7 @@ extract_key(slash,Place,URI)->
 	    Tokens=string:tokens(TempURI,"/"),
 	    Key=lists:flatten(find_slash(Tokens,tuple_to_list(Place),false,1)),
 	    Key;
-	{nomatch}->
+	nomatch->
 	    throw("Not found")
     end;
 %Extract the key from the request
@@ -192,3 +189,12 @@ string_to_list(TupleAsString)->
     {ok,Term}=erl_parse:parse_term(Tokens),
     tuple_to_list(Term).
     
+%
+% Output -> from|shortcode
+%
+get_classification(param)->
+    from;
+get_classification(slash) ->
+    from;
+get_classification(shortcode) ->
+    shortcode.

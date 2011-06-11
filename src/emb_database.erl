@@ -8,12 +8,13 @@
 -module(emb_database). 
 
 -export([start/0]).
--export([insert/4,batch_insert/1]).
--export([retrieve/1]).
+-export([insert/5,batch_insert/1]).
+-export([retrieve/1,retrieve/2]).
+
 
 -include("embedder.hrl").
 
--record(?TableName,{key,params,default_values,embed_code}).
+-record(?TableName,{key,classification,params,default_values,embed_code}).
 
 %
 % Start mnesia database. 
@@ -23,7 +24,7 @@ start()->
     mnesia:create_schema([node()]),
     ok=mnesia:start(),
     success=create(),
-    success=batch_insert(emb_loadfromfile:read_all()).
+    success=batch_insert(emb_loadfromfile:read_lines()).
 
 %
 % Create the table
@@ -43,8 +44,8 @@ create()->
 %
 % Insert a record in the database
 % Output -> {ok,atomic}
-insert(Key,Params,DefaultValues,Code)->
-    Record = #?TableName{key = Key, params = Params,default_values=DefaultValues,embed_code= Code},
+insert(Key,Classif,Params,DefaultValues,Code)->
+    Record = #?TableName{key = Key,classification=Classif, params = Params,default_values=DefaultValues,embed_code= Code},
     F= fun()->
 	       mnesia:write(Record)
        end,
@@ -57,8 +58,8 @@ insert(Key,Params,DefaultValues,Code)->
 % Insert a list of lines (likely from a file)
 % Output-> fail| success
 batch_insert([Data|RestList])->
-    {SiteKey,Params,DefaultValues,Code}=Data,
-    case insert(SiteKey,Params,DefaultValues,Code) of
+    {SiteKey,Class,Params,DefaultValues,Code}=Data,
+    case insert(SiteKey,Class,Params,DefaultValues,Code) of
 	{atomic,ok}->
 	    batch_insert(RestList);
 	_->
@@ -79,7 +80,36 @@ retrieve(Key)->
       end,
     {atomic,Data}=mnesia:transaction(F),
     case Data of
-	[{?TableName,KeyInFile,Arguments,DefaultValues,Code}]->
+	[{?TableName,KeyInFile,_,Arguments,DefaultValues,Code}]->
+	    {KeyInFile,Arguments,DefaultValues,Code};
+	[]->
+	    notfound
+    end.
+
+%
+% Get a key from the database
+% Output : Data|[]
+retrieve(from,Key)->
+    Record = #?TableName{key = Key,classification='from', params = '_',default_values='_',embed_code='_'},
+    F= fun()->
+	       mnesia:match_object(Record)
+       end,
+    {atomic,Data}=mnesia:transaction(F),
+    case Data of
+	[{?TableName,KeyInFile,_,Arguments,DefaultValues,Code}]->
+	    {KeyInFile,Arguments,DefaultValues,Code};
+	[]->
+	    notfound
+    end;
+% Use for shortcode
+retrieve(shortcode,Key) ->
+    Record = #?TableName{key = Key,classification='_', params = '_',default_values='_',embed_code='_'},
+    F= fun()->
+	       mnesia:match_object(Record)
+       end,
+    {atomic,Data}=mnesia:transaction(F),
+    case Data of
+	[{?TableName,KeyInFile,_,Arguments,DefaultValues,Code}]->
 	    {KeyInFile,Arguments,DefaultValues,Code};
 	[]->
 	    notfound

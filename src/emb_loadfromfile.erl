@@ -13,7 +13,7 @@
 -export([open_and_search/1]).
 
 -export([read_all/0]).
-% TODO Add advise for speedup ?
+-export([read_lines/0]).
 
 -export([get_compatibility_list/0]).
 
@@ -24,7 +24,7 @@ open_and_read()->
     {ok,File}=file:open(?PathToEmbList,[read]),
     lists:flatten(for_each_line(File)).
 %
-% Read all the lines from the embedded server
+% Read all the lines from the embedded server. The lines read are read as TEXT
 % Output-> [Head|Tail], Head = {Key,Arguments,DefaultValue,Code}
 read_all()->
     {ok,File}=file:open(?PathToEmbList,[read]),
@@ -41,6 +41,29 @@ read_all(File)->
 	    [KeyInFile,Arguments,DefaultValues,Code,_]=ParamList,
 	    [{KeyInFile,Arguments,DefaultValues,Code},read_all(File)]
     end.
+
+%
+% 
+% 
+% 
+read_lines() ->
+    {ok,File}=file:open(?PathToEmbList,[read]),
+    lists:flatten(read_lines(File)).
+read_lines(File) ->
+    case io:get_line(File,"") of
+	eof->
+	    file:close(File),
+	    [];
+	 Line->
+	    ParamList=re:split(Line,?Separator,[{return,list}]),
+	    [KeyInFile,Arguments,DefaultValues,Code,_]=ParamList,
+	    {ok,ArgumentsTuple}=emb_util:string_to_tuple(Arguments),
+	    [Classif|_]=tuple_to_list(ArgumentsTuple),
+	    Classification=embedder_engine:get_classification(Classif),
+	    {ok,DefaultValuesTuple}=emb_util:string_to_tuple(DefaultValues),
+	    [{KeyInFile,Classification,ArgumentsTuple,DefaultValuesTuple,Code},read_lines(File)]
+    end.
+    
 	    
 
 % Read each line
@@ -100,4 +123,3 @@ build_compatibility(File)->
 	    [Key,Args,Default,_,_]=ParamList,
 	    [{Key,Args,Default},build_compatibility(File)]
     end.
-    
