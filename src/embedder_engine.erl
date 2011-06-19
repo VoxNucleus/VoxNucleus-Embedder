@@ -103,12 +103,22 @@ extract_key(param,ParamName,URI) ->
 	    Key=string:substr(CompleteKey,lists:flatlength([ParamName,"="])+1,
 			      length(CompleteKey));
 	nomatch->
-	    throw("They key cannot be found")
+	    throw("The key cannot be found")
     end.
+% Finish that
+%
+extract_key(shortcode,A) ->
+    case yaws_api:getvar(A,"website") of
+	{ok,Website}->
+	    Website;
+	nomatch ->
+	    throw("The Key cannot be found")
+    end.
+
 
 % 
 % Find key(s) when it is a slash
-% At the moment the first time a keyis found there is no slash between the two. TODO : Implement a more flexible system
+% At the moment the first time a keyis found there is no slash between the two.
 %
 find_slash([Token|TokenRest],[Place|Rest],Delimiter,N)->
     if
@@ -164,10 +174,10 @@ build_replace_pattern(N)->
 % DefaultValues : [DefaultValue|OtherDefaultValues]
 % Output -> [param,Replacement]
 % param : atom()
-%Replacement : List() String
+% Replacement : List(): String
 find_param(A,[Param|RestParam],[DefaultValue|RestValues])->
     ParamString = atom_to_list(Param),
-    DefValString=atom_to_list(DefaultValue),
+    DefValString=default_val_to_string(DefaultValue),
     case yaws_api:getvar(A,ParamString) of
 	undefined->
 	    ParamValue=DefValString;
@@ -179,6 +189,18 @@ find_param(A,[Param|RestParam],[DefaultValue|RestValues])->
     [{Param,ParamValue}|find_param(A,RestParam,RestValues)];
 find_param(_,[],_) ->
     [].
+
+%
+% Convert the default value to a list(a string)
+%
+default_val_to_string(DefValue) when is_integer(DefValue)->
+    integer_to_list(DefValue);
+default_val_to_string(DefValue) when is_atom(DefValue) ->
+    atom_to_list(DefValue);
+default_val_to_string(DefValue) when is_list(DefValue) ->
+    DefValue.
+
+    
 
 %
 % Take a tuple of the form "{one,two,three,four}." and outputs [one,two,three]
@@ -198,3 +220,5 @@ get_classification(slash) ->
     from;
 get_classification(shortcode) ->
     shortcode.
+
+

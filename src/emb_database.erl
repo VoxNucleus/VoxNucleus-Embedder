@@ -7,14 +7,18 @@
 
 -module(emb_database). 
 
+-author("Victor Kabdebon").
+-include("embedder.hrl").
+
 -export([start/0]).
 -export([insert/5,batch_insert/1]).
 -export([retrieve/1,retrieve/2]).
 
-
--include("embedder.hrl").
-
 -record(?TableName,{key,classification,params,default_values,embed_code}).
+
+% records for v0.4
+-record(stats_verif,{key,verif}).
+-record(stats_requests,{key,request}).
 
 %
 % Start mnesia database. 
@@ -39,7 +43,6 @@ create()->
 	_ ->
 	    fail
     end.
-
 
 %
 % Insert a record in the database

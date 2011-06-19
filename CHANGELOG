@@ -1,3 +1,11 @@
+v0.3
+- Added new website to the compatibility list (42 in present version are compatible)
+- For the most common websites additional parameters have been added ( width,height, startat, autoplay, etc... ). The rest will be realised in the new versions
+- Various Performance improvements
+- Added a minified version of the javascript client
+- Rewritten a good portion of the code to be compatible in the future with "shortcode". shortcode will be introduced in v0.4
+- The javascript client is now compatible with inline parameters for each video. Those inline parameters have higher priority than the ones defined at the client level
+
 v0.2
 - Added close to 15 new compatible websites
 - Lot of bugfixes
