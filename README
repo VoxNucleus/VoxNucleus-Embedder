@@ -1,4 +1,4 @@
-## Embedder v0.2
+## Embedder v0.3
 ## Author : Victor Kabdebon
 ## Website : http://www.victorkabdebon.com 
 ## Website (2) : http://www.victorkabdebon.com
@@ -15,7 +15,8 @@
 
 embedder-equivalence : this is the file you want to modify to add more options. Warning please respect the format.
 Only this format is accepted :
-key;{parameters}.;{defaultvalues};embedded code;NEWLINE
+key;;{parameters}.;;{defaultvalues};;embedded code;;$NEWLINE$
+Where $NEWLINE$ is a newline
 
 The first of the parameters indicates to the embedder how to find the 
 
@@ -61,7 +62,7 @@ The configuration of the server is in ./include/embedder.hrl
 -Issues with Yaws dying on windows at startup.
 -When using the "slash" method if you need to consider the last slashed element and there is a parameter (&parameter=something) or id such as (#id) it will fail.
 -When using several links videos (like in the example) when clicking different links it will not close the previous videos.
-- Websites which add things like # in the end of their address or parameters make the embedding process fail (considers the things as part of the key)
+- Websites which add things like # in the end of their address or parameters make the embedding process fail (considers the characters after # as part of the key)
 
 ##Compatibility "out of the box"(more to be added)
 
@@ -103,6 +104,18 @@ Is there any ?
 (Belgian)
 http://www.kewego.be/ {Thanks for the nice ".html" after the key to your video, unnecessary at the end of your page...}
 
-## About the images
+##Examples
 
-A serie of images are provided with this program. While you may use or modify them for free without limitation you MUST mention the creator : Hugo Leygnac. Thank you for your respect.
+# Where to find them ?
+The examples are meant to work as a part of of an apache server. Add the following lines to your apache2.conf :
+
+ProxyPass /embedder-server http://localhost:4446
+ProxyPassReverse /embedder-server http://localhost:4446
+
+This will allow you to visit Erlembedder from port 80, if apache2 is working by simple going to http://localhost/embedder-server/
+Since the examples are in the index.html you can access the examples by going to http://localhost/embedder-server/ with your favorite browser (So no old version of IE, right ?).
+
+
+# About the images used
+
+A serie of images are provided with this program. While you may use or modify them for free and without limitation you MUST mention the creator : Hugo Leygnac. Thank you for your respect.
