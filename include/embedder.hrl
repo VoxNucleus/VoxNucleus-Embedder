@@ -1,6 +1,6 @@
 %%
 %% File: embedder.hrl
-%% Description : 
+%% Description : Configuration. FOR MODIFICATIONS IN THIS FILE TO TAKE EFFECT YOU HAVE TO MAKE IT.
 %% Author: Victor Kabdebon <victor.kabdebon@victorkabdebon.net>
 %% License : GPL v2
 %% Website : http://www.victorkabdebon.net
@@ -19,13 +19,14 @@
 -define(ErlEmbedderOwnerWebsite,"http://www.voxnucleus.fr").
 
 % Version of ErlEmbedder
--define(ErlEmbedderVersion,"v0.3").
+-define(ErlEmbedderVersion,"v0.4").
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%
 %%% Server configuration
 
+% Set if the server is in debug mode or not
 % Accepted values : true|false
 -define(ServerDebugMode,true).
 
@@ -37,6 +38,12 @@
 
 % Logging folder
 -define(LoggingFolder,"./temp/logs").
+
+% Control the stats priting
+%
+-define(ShowStatsPage,true).
+-define(ShowGeneralInfos,true).
+-define(ShowStats,true).
 
 %%%%%%%%%%%%%%%%%%%%%%
 %%% Database configuration

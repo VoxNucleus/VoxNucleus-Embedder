@@ -64,9 +64,12 @@ ispresent(A)->
 		notfound->
 		    false;
 		 {_,Arguments,_,_}->
+		    emb_database:update_stats(verif,ExtractedURL),
 		    {true,"test"}
 	    end
     end.
+
+
 %tuple_to_string(tuple_to_list(Arguments))
 tuple_to_string([NewArg,Rest])->
     [atom_to_list(NewArg),tuple_to_string(Rest)];

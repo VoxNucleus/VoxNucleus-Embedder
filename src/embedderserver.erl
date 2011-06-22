@@ -50,7 +50,8 @@ start_atom_yaws(Args) ->
 		listen = {0,0,0,0},
 		docroot = "../examples/",
 		appmods =[{"/request",embedder_client},
-			  {"/verification",emb_verification}]
+			  {"/verification",emb_verification},
+			  {"/stat",emb_stats}]
 	       },
     Result = yaws_api:setconf(GC, [[SC]]),
     error_logger:info_msg("Finished starting embedded yaws~n",[]),

@@ -1,3 +1,9 @@
+v0.4 
+
+- Added simple stats (and it will stay simple in order to keep the speed).
+- Added simple informations along with stats
+- Added a few more websites
+
 v0.3
 - Added new website to the compatibility list (42 in present version are compatible)
 - For the most common websites additional parameters have been added ( width,height, startat, autoplay, etc... ). The rest will be realised in the new versions

@@ -75,6 +75,7 @@ find_url_key(From,A) ->
 	notfound ->
 	    notfound;
 	{_,Arguments,DefaultValues,Code} ->
+	    emb_database:update_stats(request,ExtractedURL),
 	    Key=embedder_engine:find_key(Arguments,DefaultValues,From,A),
 	    {Key,Arguments,DefaultValues,Code};
 	_ ->
