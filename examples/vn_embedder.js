@@ -8,7 +8,7 @@
  * Website : http://www.voxnucleus.fr
  * Author : Victor Kabdebon ( http://www.victorkabdebon.com )
  * License : GPLv2, Please respect this license, thank you very much.
- * Version : v0.3
+ * Version : v0.4
  * Compatibility : v0.2 for ErlEmbedder Jquery 1.4.2+
  **/
 
@@ -40,26 +40,58 @@ function parse_vnparam(input){
   }
 }
 
+/**
+ * Parse a shortcode string of the form website.ext:key;param1:value1
+ * Returns an object of the form {website:website.ext,key:video-key,param1:value1,param2,value2}
+ */
+function parse_shortcode(shortcode_string){
+  var result={};
+  try{
+    if(input){
+      var split_res=input.split(";");
+      // Parse website and key
+      var first_part=split_res[0];
+      result['website']=first_part[0];
+      result['key']=first_part[1];
+      //Parse the rest of the options
+      for(var index=1;index< split_res.length;index++){
+	var fragment=split_res[index];
+	var split_fragment_res=fragment.split(":");
+	//Only do something if there are at least 2 values in it
+	if(split_fragment_res.length>1){
+	  result[split_fragment_res[0]]=split_fragment_res[1];
+	}
+      }
+    }
+  }catch(err){
+    result={};
+  }finally{
+    return result;
+  }
+}
 
 (function($){
    $.fn.vn_embedder= function(params){
      var default_params={
        verification:true,
        container_class:'vn_vid_cont',
-       trigger_class:'vn_emb',
-       trigger_class_expand:'vn_emb_exp',
        target_class:'vn_emb_target',
        embedder_target_id:"",
        vid_params:{
-	 hd:true,
-	 height:500,
-	 width:500
+	 hd:true
+       },
+       trigger:{
+	 tclass:'trigger',
+	 class_expanded:'vn_emb_exp',
+	 internal_code:"Lancer video",
+	 title:"Play"
        },
        messages:{
 	 server_error:"Erreur serveur",
 	 error:"Erreur",
 	 not_found:"Non trouve",
-	 trigger_code:"Lancer video"
+	 trigger_code:"Lancer video",
+	 trigger_title:""
        },
        embedder_server:'/embedder-server',
        jsonp:false
@@ -84,7 +116,8 @@ function parse_vnparam(input){
 			 var new_dom= new_dom=document.createElement("div");
 			 new_dom.setAttribute("class","embedder_container");
 			 var new_dom_trig=document.createElement("span");
-			 new_dom_trig.setAttribute("class","trigger");
+			 new_dom_trig.setAttribute("class",params.trigger.tclass);
+			 new_dom_trig.setAttribute("title",params.trigger.title),
 			 $(new_dom_trig).data("emb_param",parse_vnparam($(to_embed).attr("vn_emb_param")));
 			 new_dom_trig.innerHTML=params.messages.trigger_code;
 			 new_dom.appendChild(new_dom_trig);
@@ -101,11 +134,10 @@ function parse_vnparam(input){
 				      where_to_insert=$("#"+params.embedder_target_id);
 				    }
 				    var inline_params=$(this).data("emb_param");
-
 				    var is_expended=$(this).attr("vn_expanded");
 				    if(is_expended=="true"){
-				    //Minimize & delete
-				      $(this).removeClass(params.trigger_class_expand);
+				      //Minimize & delete
+				      $(this).removeClass(params.trigger.class_expanded);
 				      where_to_insert
 					.find("."+params.container_class)
 					.slideUp('slow',function(){
@@ -113,12 +145,12 @@ function parse_vnparam(input){
 						   $(new_dom_trig).attr("vn_expanded","false");
 						 });
 				    }else{
-				      $(this).addClass(params.trigger_class_expand);
+				      $(this).addClass(params.trigger.class_expanded);
 				      var data_options={
-					  from:vid_address,
-					  width:params.width,
-					  height:params.height,
-					  hd:params.hd};
+					from:vid_address,
+					width:params.width,
+					height:params.height,
+					hd:params.hd};
 				      //Merge inline options into data_options
 				      $.extend(true,data_options,inline_params);
 
@@ -168,12 +200,3 @@ function parse_vnparam(input){
 
    };
  })(jQuery);
-
-
-/**
- * TODO
- * This function will be introduced in v0.4
- */
-function parse_shortcode(shortcode_string){
-  return "";
-}
