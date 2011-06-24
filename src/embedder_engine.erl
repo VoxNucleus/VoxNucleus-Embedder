@@ -1,7 +1,6 @@
-%%
 %% File : embedder_engine.erl
-%% Description : "Core" of the algorithm
-%% Supports two kind of methods for viewing videos : either ?param=videokey&anyotherparam or /videokey?anyotherparam=
+%% Description : Engine of the algorithm
+%% Supports two kind of methods for embedding videos
 %% Author : Victor Kabdebon  <victor.kabdebon@victorkabdebon.net>
 %% Date : 15/05/2011
 %%
@@ -79,7 +78,6 @@ find_key(Arguments,DefaultValues,URL,A)->
 % Can either be a slash "/key" or a param "?param=key"
 % Output -> Key
 % Throws error when no key is found
-
 extract_key(slash,Place,URI)->
     {ok,MP}=re:compile(?URISlashKeyExtractor,[]),
     case re:run(URI,MP,[]) of
