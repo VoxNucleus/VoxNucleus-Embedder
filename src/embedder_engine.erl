@@ -69,28 +69,33 @@ find_key(Arguments,DefaultValues,URL,A)->
 	slash->
 	    extract_key(slash,Param,URL);
 	param ->
-	    extract_key(param,Param,URL)
+	    extract_key(param,Param,URL);
+	shortcode ->
+	    extract_key(shortcode,A)
     end.
 
 
-% 
 % Extract the key from the URI
-% Can either be a slash "/key" or a param "?param=key"
-% Output -> Key
+% Can either be a slash "/key", a param "?param=key", a shortcode or a regex(not yet)
+% Output -> Key|throw(Error)
 % Throws error when no key is found
 extract_key(slash,Place,URI)->
     {ok,MP}=re:compile(?URISlashKeyExtractor,[]),
     case re:run(URI,MP,[]) of
-	{match,[FirstMatch|RestQueue]}->
+	{match,[FirstMatch|_]}->
 	    {_,Length}= FirstMatch,
 	    TempURI=string:substr(URI,Length),
 	    Tokens=string:tokens(TempURI,"/"),
 	    Key=lists:flatten(find_slash(Tokens,tuple_to_list(Place),false,1)),
 	    Key;
 	nomatch->
-	    throw("Not found")
+	    throw("The key cannot be found");
+	_ ->
+	    throw("Unknown error...")
     end;
-%Extract the key from the request
+% Extract the key from the request
+% ParamName : string -> name of the parameter
+% URI : string -> URL of the website
 extract_key(param,ParamName,URI) ->
     Pattern=lists:flatten([atom_to_list(ParamName),?ParamExtractor]),
     {ok,MP}=re:compile(Pattern),
@@ -98,19 +103,27 @@ extract_key(param,ParamName,URI) ->
 	{match,[FirstMatch|_]} ->
 	    {Offset,Length}=FirstMatch,
 	    CompleteKey=string:substr(URI,Offset+1,Length+1),
+	    %Useless ?
 	    Key=string:substr(CompleteKey,lists:flatlength([ParamName,"="])+1,
 			      length(CompleteKey));
 	nomatch->
-	    throw("The key cannot be found")
-    end.
-% Finish that
-%
+	    throw("The key cannot be found");
+	_ ->
+	    throw("Unknown error...")
+    end;
+% Extract the key using a regex
+extract_key(regex,Regex,URI)->
+    throw("The key cannot be found").
+% Extract the key from the parameters (GET / POST should work, only GET has been tested)
+% The GET parameter has to be "key"
 extract_key(shortcode,A) ->
-    case yaws_api:getvar(A,"website") of
+    case yaws_api:getvar(A,"key") of
 	{ok,Website}->
 	    Website;
 	nomatch ->
-	    throw("The Key cannot be found")
+	    throw("The key cannot be found");
+	_ ->
+	    throw("Unknown error...")
     end.
 
 

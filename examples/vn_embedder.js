@@ -8,8 +8,8 @@
  * Website : http://www.voxnucleus.fr
  * Author : Victor Kabdebon ( http://www.victorkabdebon.com )
  * License : GPLv2, Please respect this license, thank you very much.
- * Version : v0.4
- * Compatibility : v0.2 for ErlEmbedder Jquery 1.4.2+
+ * Version : v0.4.1 (follows Erlembedder notation for 0.x and then real client version)
+ * Compatibility : v0.4 for ErlEmbedder Jquery 1.4.2+
  **/
 
 
@@ -19,8 +19,9 @@
  * Input : A string or null value(it will )
  * Returns : An object of the form {param1:value1,param2:value2} (might be empty {})
  */
-function parse_vnparam(input){
+function parse_vnparam(default_options,input){
   var result={};
+  $.extend(true,default_options,result);
   try{
     if(input){
       var split_res=input.split(";");
@@ -34,7 +35,7 @@ function parse_vnparam(input){
       }
     }
   }catch(err){
-    result={};
+    result=default_options;
   }finally{
     return result;
   }
@@ -47,10 +48,10 @@ function parse_vnparam(input){
 function parse_shortcode(shortcode_string){
   var result={};
   try{
-    if(input){
-      var split_res=input.split(";");
+    if(shortcode_string){
+      var split_res=shortcode_string.split(";");
       // Parse website and key
-      var first_part=split_res[0];
+      var first_part=split_res[0].split(":");
       result['website']=first_part[0];
       result['key']=first_part[1];
       //Parse the rest of the options
@@ -69,14 +70,69 @@ function parse_shortcode(shortcode_string){
     return result;
   }
 }
+/**
+ * Build the verification request
+ * Output : Javascript object
+ */
+function b_verif_req(href,shortcode){
+  var data_arg={
+    requesting:'ispresent'
+  };
+  if(shortcode){
+    data_arg['shortcode']=true;
+    var parsed_infos=parse_shortcode(shortcode);
+    data_arg=$.extend(true,parsed_infos,data_arg);
+  } else if(href){
+    data_arg['from']=href;
+  }
+  return data_arg;
+}
+/**
+ * Build the embedding request
+ * Output: Javascript object
+ */
+function b_embed_req(href,shortcode,options){
+  var vid_infos={};
+  //Merge default options with vid_infos
+  vid_infos=$.extend(true,options,vid_infos);
+  if(shortcode){
+    //set short to true
+    vid_infos['shortcode']=true;
+    var parsed_infos=parse_shortcode(shortcode);
+    //Merge shortcode
+    vid_infos=$.extend(true,parsed_infos,vid_infos);
+  } else if(href){
+    vid_infos['from']=href;
+  }
+  return vid_infos;
+}
+
+/**
+ * Plugin code.
+ ** Parameters explanation:
+ * verification: true|false -> Verify first : Useless at the moment
+ * auto_expand: true|false -> useless at the moment
+ * container_class : (string) -> Class of the container (class ?)
+ * target_class : (string) ->
+ * vid_params : (js_object) -> Parameters of the videos, depends on your configuration
+ * tclass : (string)-> Class of the triggger. Important if one wants to
+ * class_expanded: (string) -> Name of the class once expanded
+ * internal_code (string/DOM)-> Code inside the trigger
+ * title (string) -> Title when mouse over trigger
+ * messages (js_object)-> Set of messages used by the program to indicate errors
+ * embedder_server (string) -> Address of the ErlEmbedder server
+ * jsonp (boolean) -> useless at the moment
+ */
 
 (function($){
    $.fn.vn_embedder= function(params){
      var default_params={
        verification:true,
+       auto_expand:false,
        container_class:'vn_vid_cont',
        target_class:'vn_emb_target',
        embedder_target_id:"",
+       shortcode_param:'shortcode',
        vid_params:{
 	 hd:true
        },
@@ -89,114 +145,113 @@ function parse_shortcode(shortcode_string){
        messages:{
 	 server_error:"Erreur serveur",
 	 error:"Erreur",
-	 not_found:"Non trouve",
-	 trigger_code:"Lancer video",
-	 trigger_title:""
+	 not_found:"Non trouve"
+       },
+       actions:{
+	 verif_error:function(){
+	   alert("Verification error");
+	 },
+	 embedding_error:function(){
+	   alert("Embedding error");
+	 },
+	 notfound_error:function(){
+	   alert("Not found");
+	 }
        },
        embedder_server:'/embedder-server',
        jsonp:false
      };
-     var parent=document.body;
-     var trigger=null;
-     params = $.extend(default_params,params);
-     this.each(function(){
-		 var vid_address=$(this).attr("href");
-		 var to_embed=this;
-		 var verif_opt={
-		   url:params.embedder_server+"/verification",
-		   type:"GET",
-		   data:{
-		     requesting:'ispresent',
-		     from:vid_address},
-		   success:function(data, textStatus, jqXHR){
-		     if(data.success=="true"){
-		       if(data.present=="true"){
-			 parse_vnparam($(to_embed).attr("vn_emb_param"));
-			 var old_code=$(to_embed).clone();
-			 var new_dom= new_dom=document.createElement("div");
-			 new_dom.setAttribute("class","embedder_container");
-			 var new_dom_trig=document.createElement("span");
-			 new_dom_trig.setAttribute("class",params.trigger.tclass);
-			 new_dom_trig.setAttribute("title",params.trigger.title),
-			 $(new_dom_trig).data("emb_param",parse_vnparam($(to_embed).attr("vn_emb_param")));
-			 new_dom_trig.innerHTML=params.messages.trigger_code;
-			 new_dom.appendChild(new_dom_trig);
-			 $(new_dom).append(old_code);
-			 $(to_embed).replaceWith(new_dom);
+     params = $.extend(true,default_params,params);
+     this.each(
+       function(){
+	 var vid_address=$(this).attr("href");
+	 var li_shortcode=$(this).attr(params.shortcode_param);
+	 var to_embed=this;
+	 var verif_opt={
+	   url:params.embedder_server+"/verification",
+	   type:"GET",
+	   data:b_verif_req(vid_address,li_shortcode),
+	   success:function(data, textStatus, jqXHR){
+	     if(data.success=="true"){
+	       if(data.present=="true"){
+		 parse_vnparam(params.vid_params,$(to_embed).attr("vn_emb_param"));
+		 var old_code=$(to_embed).clone();
+		 var new_dom= new_dom=document.createElement("div");
+		 new_dom.setAttribute("class","embedder_container");
+		 var new_dom_trig=document.createElement("span");
+		 new_dom_trig.setAttribute("class",params.trigger.tclass);
+		 new_dom_trig.setAttribute("title",params.trigger.title),
+		 $(new_dom_trig).data("emb_param",parse_vnparam($(to_embed).attr("vn_emb_param")));
+		 new_dom_trig.innerHTML=params.trigger.internal_code;
+		 new_dom.appendChild(new_dom_trig);
+		 $(new_dom).append(old_code);
+		 $(to_embed).replaceWith(new_dom);
+		 //on click
+		 $(new_dom_trig)
+		   .click(function(){
+			    // Here we verify if there is a object with specified id where we can
+			    var where_to_insert=$(this).parent();
+			    if(params.embedder_target_id!="" &&
+			       $("#"+params.embedder_target_id).length>0){
+			      where_to_insert=$("#"+params.embedder_target_id);
+			    }
+			    var inline_params=$(this).data("emb_param");
+			    var is_expended=$(this).attr("vn_expanded");
+			    if(is_expended=="true"){
+			      //Minimize & delete
+			      $(this).removeClass(params.trigger.class_expanded);
+			      where_to_insert
+				.find("."+params.container_class)
+				.slideUp('slow',function(){
+					   $(this).remove();
+					   $(new_dom_trig).attr("vn_expanded","false");
+					 });
+			    }else{
+			      $(this).addClass(params.trigger.class_expanded);
+			      var data_options=b_embed_req(vid_address,li_shortcode,params.vid_params);
+			      //Merge inline parameters into data_options
+			      data_options=$.extend(true,data_options,inline_params);
+			      //Query normally
+			      var options={
+				url:params.embedder_server+"/request",
+				type:"GET",
+				data:data_options,
+				success:function(data, textStatus, jqXHR){
+				  if(data.status=="found"){
+				    //Set the trigger to expended
+				    var video_container = document.createElement("div");
+				    $(video_container).addClass(params.container_class);
+				    $(video_container).append(data.code);
+				    $(where_to_insert).append(video_container);
+				  }else if(data.status=="error"){
+				    $(where_to_insert).append("<span class=\" "+params.container_class+" emb_error\">"+params.messages.error+"</span>"+data.explanation);
+				  }else if(data.status=="notfound"){
+				    $(where_to_insert).append("<span class=\" "+params.container_class+" emb_notfound\">"+params.messages.not_found+"</span>");
+				  }
+				  $(new_dom_trig).attr("vn_expanded","true");
+				},
+				error:function(jqXHR, textStatus, errorThrown){
+				  $(where_to_insert).append("<span class=\""+params.target_class+" emb_error\">"+params.messages.server_error+"</span>");
+				},
+				dataType:"json"
+			      };
+			      $.ajax(options);
+			    }
+			  });
+	       }else{
+		 params.actions.embedding_error();
+	       }
+	     }else{
+	       params.actions.notfound_error();
+	     }
 
-			 //on click
-			 $(new_dom_trig)
-			   .click(function(){
-				    // Here we verify if there is a object with specified id where we can
-				    var where_to_insert=$(this).parent();
-				    if(params.embedder_target_id!="" &&
-				       $("#"+params.embedder_target_id).length>0){
-				      where_to_insert=$("#"+params.embedder_target_id);
-				    }
-				    var inline_params=$(this).data("emb_param");
-				    var is_expended=$(this).attr("vn_expanded");
-				    if(is_expended=="true"){
-				      //Minimize & delete
-				      $(this).removeClass(params.trigger.class_expanded);
-				      where_to_insert
-					.find("."+params.container_class)
-					.slideUp('slow',function(){
-						   $(this).remove();
-						   $(new_dom_trig).attr("vn_expanded","false");
-						 });
-				    }else{
-				      $(this).addClass(params.trigger.class_expanded);
-				      var data_options={
-					from:vid_address,
-					width:params.width,
-					height:params.height,
-					hd:params.hd};
-				      //Merge inline options into data_options
-				      $.extend(true,data_options,inline_params);
-
-				      //Query normally
-				      var options={
-					url:params.embedder_server+"/request",
-					type:"GET",
-					data:data_options,
-					success:function(data, textStatus, jqXHR){
-					  if(data.status=="found"){
-					    //Set the trigger to expended
-					    var video_container = document.createElement("div");
-					    $(video_container).addClass(params.container_class);
-					    $(video_container).append(data.code);
-					    $(where_to_insert).append(video_container);
-					  }else if(data.status=="error"){
-					    $(where_to_insert).append("<span class=\" "+params.container_class+" emb_error\">"+params.messages.error+"</span>"+data.explanation);
-					  }else if(data.status=="notfound"){
-					    $(where_to_insert).append("<span class=\" "+params.container_class+" emb_notfound\">"+params.messages.not_found+"</span>");
-					  }
-					  $(new_dom_trig).attr("vn_expanded","true");
-					},
-					error:function(jqXHR, textStatus, errorThrown){
-					  $(where_to_insert).append("<span class=\""+params.target_class+" emb_error\">"+params.messages.server_error+"</span>");
-					},
-					dataType:"json"
-				      };
-				      $.ajax(options);
-				    }
-
-				  });
-
-		       }else{
-			 //Impossible to embed something
-		       }
-		     }else{
-		       //does not correspond to anything
-		     }
-
-		   },
-		   error:function(jqXHR, textStatus, errorThrown){
-		     //TODO : Problem occured here
-		   }
-		 };
-		 $.ajax(verif_opt);
-	       });
+	   },
+	   error:function(jqXHR, textStatus, errorThrown){
+	     params.actions.verif_error();
+	   }
+	 };
+	 $.ajax(verif_opt);
+       });
 
    };
  })(jQuery);

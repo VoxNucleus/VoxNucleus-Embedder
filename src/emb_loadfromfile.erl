@@ -9,7 +9,7 @@
 -include("embedder.hrl").
 -author("Victor Kabdebon victor.kabdebon@victorkabdebon.net").
 
--export([open_and_read/0]).
+
 -export([open_and_search/1]).
 
 -export([read_all/0]).
@@ -17,12 +17,7 @@
 
 -export([get_compatibility_list/0]).
 
-%
-% Open a file for read
-%
-open_and_read()->
-    {ok,File}=file:open(?PathToEmbList,[read]),
-    lists:flatten(for_each_line(File)).
+
 %
 % Read all the lines from the embedded server. The lines read are read as TEXT
 % Output-> [Head|Tail], Head = {Key,Arguments,DefaultValue,Code}
@@ -37,13 +32,15 @@ read_all(File)->
 	    file:close(File),
 	    [];
 	 Line->
-	    ParamList=re:split(Line,?Separator,[{return,list}]),
-	    [KeyInFile,Arguments,DefaultValues,Code,_]=ParamList,
-	    [{KeyInFile,Arguments,DefaultValues,Code},read_all(File)]
+	    case re:split(Line,?Separator,[{return,list}]) of
+		List when length(List)==4 ->
+		    [KeyInFile,Arguments,DefaultValues,Code,_]=List,
+		    [{KeyInFile,Arguments,DefaultValues,Code},read_all(File)];
+		_->
+		    read_all(File)
+	    end
     end.
 
-%
-% 
 % 
 % 
 read_lines() ->
@@ -55,29 +52,31 @@ read_lines(File) ->
 	    file:close(File),
 	    [];
 	 Line->
-	    ParamList=re:split(Line,?Separator,[{return,list}]),
-	    [KeyInFile,Arguments,DefaultValues,Code,_]=ParamList,
+	    case analyze_line(Line) of
+		skip->
+		    [read_lines(File)];
+		{KeyInFile,Classification,ArgumentsTuple,DefaultValuesTuple,Code}->
+		    [{KeyInFile,Classification,ArgumentsTuple,DefaultValuesTuple,Code},read_lines(File)]
+	    end
+    end.
+
+%
+% Read a line
+% Output -> {Key,Classification,Args,DefValues,Code}|skip
+analyze_line(Line)->
+    case re:split(Line,?Separator,[{return,list}]) of
+	List when length(List)==5 ->
+	    [KeyInFile,Arguments,DefaultValues,Code,_]=List,
 	    {ok,ArgumentsTuple}=emb_util:string_to_tuple(Arguments),
 	    [Classif|_]=tuple_to_list(ArgumentsTuple),
 	    Classification=embedder_engine:get_classification(Classif),
 	    {ok,DefaultValuesTuple}=emb_util:string_to_tuple(DefaultValues),
-	    [{KeyInFile,Classification,ArgumentsTuple,DefaultValuesTuple,Code},read_lines(File)]
-    end.
-    
-	    
-
-% Read each line
-%TODO : Remove this function
-for_each_line(File)->
-    case io:get_line(File,"") of
-	eof->	 
-	    file:close(File);
-	Line ->
-	    lists:concat([Line,for_each_line(File)])
+	    {KeyInFile,Classification,ArgumentsTuple,DefaultValuesTuple,Code};
+	_->
+	    skip
     end.
 
 
-%
 % Open the file and search through it
 % Output notfound|Params
 % Params = {Key,Arguments,Code}
@@ -100,7 +99,7 @@ find_in_file(File,Key)->
 		    [KeyInFile,Arguments,DefaultValues,Code,_]=ParamList,
 		    file:close(File),
 		    {KeyInFile,Arguments,DefaultValues,Code};
-		List->
+		_->
 		    find_in_file(File,Key)
 	    end
     end.

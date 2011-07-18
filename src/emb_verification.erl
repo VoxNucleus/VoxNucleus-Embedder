@@ -53,20 +53,30 @@ build_table_lines([{Key,Args,Default}|Rest],Number) ->
 
 %
 % Check if an URL is present
-%
+% TODO : Change the true "test" to a structure that sends an argument list
 ispresent(A)->
-    case yaws_api:getvar(A,"from") of
-	undefined->
-	    throw("Parameter missing");
-	{ok,From}->
+    case {yaws_api:getvar(A,"from"),yaws_api:getvar(A,"shortcode")} of
+	{{ok,From},_}->
 	    ExtractedURL= embedder_engine:extract_url(From),
-	    case emb_database:retrieve(ExtractedURL) of
+	    case emb_database:retrieve(from,ExtractedURL) of
 		notfound->
 		    false;
-		 {_,Arguments,_,_}->
+		{_,Arguments,_,_}->
 		    emb_database:update_stats(verif,ExtractedURL),
 		    {true,"test"}
-	    end
+	    end;
+	{_,{ok,_}} ->
+	    %Dangerous ?
+	    {ok,Website}=yaws_api:getvar(A,"website"),
+	    case emb_database:retrieve(shortcode,Website) of
+		notfound->
+		    false;
+		{_,Arguments,_,_}->
+		    emb_database:update_stats(verif,Website),
+		    {true,"test"}
+	    end;
+	_ ->
+	    throw("Parameter missing")
     end.
 
 

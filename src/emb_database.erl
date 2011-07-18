@@ -16,6 +16,8 @@
 
 -export([insert/5,batch_insert/1]).
 -export([retrieve/1,retrieve/2]).
+-export([retrieve_all/0]).
+
 
 %stats functions
 
@@ -173,6 +175,13 @@ retrieve(shortcode,Key) ->
 	[]->
 	    notfound
     end.
+
+retrieve_all()->
+    Record = #?TableName{key = '_',classification='_', params = '_',default_values='_',embed_code='_'},
+    F= fun()->
+	       mnesia:match_object(Record)
+       end,
+    {atomic,Data}=mnesia:transaction(F).
 
 %
 % Add one to the counter. It *should* be atomic according to the description

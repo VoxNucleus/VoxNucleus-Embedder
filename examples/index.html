@@ -5,28 +5,28 @@
   <script type="text/javascript" src="/embedder-server/vn_embedder.js"></script>
   <script type="text/javascript" >
     $(document).ready(function(){
-    $("a.to_emb").vn_embedder({
+    $("span.to_emb").vn_embedder({
     //embedder_target_id:"vn_media_player",
     embedder_server:"/embedder-server/",
-    messages:{trigger_code:""}});
+    trigger:{internal_code:""}});
     });
   </script>
 
 <style type="text/css">
-span.trigger {
-background-image:url('/embedder-server/button_play.png');
-background-repeat: no-repeat;
-height:20px;
-width:34px;
-display:inline-block;
-}
-span.trigger:hover{
-
-}
-span.trigger.vn_emb_exp{
-background-image:url('/embedder-server/button_expanded.png');
-}
-p {color:blue;}
+  span.trigger {
+  background-image:url('/embedder-server/button_play.png');
+  background-repeat: no-repeat;
+  height:20px;
+  width:34px;
+  display:inline-block;
+  }
+  span.trigger:hover{
+  
+  }
+  span.trigger.vn_emb_exp{
+  background-image:url('/embedder-server/button_expanded.png');
+  }
+  p {color:blue;}
 </style>
   </head>
   
@@ -127,16 +127,21 @@ p {color:blue;}
 
     <h3>gametrailers.com</h3>
 
-<a class="to_emb" href="http://www.gametrailers.com/video/e3-2011-tomb-raider/714561"> link to gametrailers</a>
-
-<h3>collegehumor.com</h3>
-
-<a class="to_emb" href="http://www.collegehumor.com/video/6505216/good-night-internet"> link to Collegehumor</a>
-
-<h3>Worldstarhiphop.com</h3>
+    <a class="to_emb" href="http://www.gametrailers.com/video/e3-2011-tomb-raider/714561"> link to gametrailers</a>
+    
+    <h3>collegehumor.com</h3>
+    
+    <a class="to_emb" href="http://www.collegehumor.com/video/6505216/good-night-internet"> link to Collegehumor</a>
+    
+    <h3>Worldstarhiphop.com</h3>
     
     <a class="to_emb" href="http://worldstarhiphop.com/videos/video.php?v=wshh55ws4MI63e705K63"> link to Collegehumor</a>
     
+
+    <h2>Shortcode</h2>
+    
+    The following examples illustration the principle of shortcode:
+    <span class="to_emb" shortcode="vimeo.com:24016343">vimeo.com:24016343</span>
     
     
   </body>

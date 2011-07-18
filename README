@@ -11,7 +11,6 @@
 
 ## How does it work?
 
-### WARNING MASTER IS IN V0.2 and v0.2 is in v0.1 (sorry about that)
 
 embedder-equivalence : this is the file you want to modify to add more options. Warning please respect the format.
 Only this format is accepted :
@@ -38,10 +37,11 @@ The code is divided into logical units. The different files will be renamed in t
 8. Enjoy
 
 
-#Yaws - Configuration
+# Yaws - Configuration
 
 This is the first thing you want to modify. By default the server is embedded in the program (and it should be like that) but it uses a port that you can select.
 The configuration of the server is in ./include/embedder.hrl
+
 
 ## Features
 
@@ -84,6 +84,7 @@ The configuration of the server is in ./include/embedder.hrl
 -gametrailers.com
 -Collegehumor.com
 -worldstarthiphop.com
+(...)
 
 (Russian)
 -rutube.ru
@@ -100,11 +101,35 @@ Is there any ?
 (French)
 -Jeuxvideo.com {Thanks guys for the key to your video at the end of your url...}
 -gamespot.com {raw address because their multiple slashes}
-
+-Koreus.com {.html in the end needs to be removed}
 (Belgian)
 http://www.kewego.be/ {Thanks for the nice ".html" after the key to your video, unnecessary at the end of your page...}
 
-##Examples
+## How to use
+
+# Normal way
+
+The "normal" way to use ErlEmbedder is send the raw address to ErlEmbedder and let it automatically extract the key and then send back the embed code.
+
+# Video Options
+
+
+
+# Working with shortcode
+
+Because some of the video hosting websites didn't give the world a way to make the asociation between the URL of the video and the video stream itself I was obliged to introduce a new way to include a video. This way is called "shortcode" and it is MANUAL. The good thing with shortcode is that it is compatible with 100 % of all the video streaming services. The bad thing is you have to know where to look at to do it... 99 % of the time you can guess the shortcode by looking at the embed code, you need to find the key from there.
+
+# Video options priorities
+
+If you use the default javascript client with Erlembedder you have different levels of priority for the options. They are the following (by order of highest to lowest priority)
+
+-Without shortcode
+Inline Options -> Jquery plugin configuration level -> Default Values
+
+-With shortcode
+Inline Options -> Shortcode options -> JQuery plugin configuration level -> Default values
+
+## Examples
 
 # Where to find them ?
 The examples are meant to work as a part of of an apache server. Add the following lines to your apache2.conf :

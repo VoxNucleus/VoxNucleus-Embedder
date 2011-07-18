@@ -1,8 +1,10 @@
 v0.4 
 
+- Shortcode added to the list of possible options. See readme for more information
 - Added simple stats (and it will stay simple in order to keep the speed).
 - Added simple informations along with stats
 - Added a few more websites
+- Added possiblity to write commands/ white lines in the embedded-equivalence file. Everything that is not 
 
 v0.3
 - Added new website to the compatibility list (42 in present version are compatible)
