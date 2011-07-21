@@ -101,16 +101,17 @@ find_url_key(From,A) ->
 	    Key=embedder_engine:find_key(Arguments,DefaultValues,From,A),
 	    {Key,Arguments,DefaultValues,Code};
 	_ ->
-	    throw("Error in the file...")
+	    throw("Error in file...")
     end.
 find_url_key(shortcode,From,Key,A)->
     case emb_database:retrieve(shortcode,From) of
 	notfound->
 	    notfound;
 	{_,Arguments,DefaultValues,Code} ->
+	    emb_database:update_stats(request,From),
 	    {Key,Arguments,DefaultValues,Code};
 	_ ->
-	    throw("Error in file")
+	    throw("Error in file...")
     end.
 
 

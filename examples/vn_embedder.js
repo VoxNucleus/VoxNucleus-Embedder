@@ -21,7 +21,7 @@
  */
 function parse_vnparam(default_options,input){
   var result={};
-  $.extend(true,default_options,result);
+  $.extend(true,result,default_options);
   try{
     if(input){
       var split_res=input.split(";");
@@ -81,7 +81,7 @@ function b_verif_req(href,shortcode){
   if(shortcode){
     data_arg['shortcode']=true;
     var parsed_infos=parse_shortcode(shortcode);
-    data_arg=$.extend(true,parsed_infos,data_arg);
+    data_arg=$.extend(true,data_arg,parsed_infos);
   } else if(href){
     data_arg['from']=href;
   }
@@ -94,13 +94,13 @@ function b_verif_req(href,shortcode){
 function b_embed_req(href,shortcode,options){
   var vid_infos={};
   //Merge default options with vid_infos
-  vid_infos=$.extend(true,options,vid_infos);
+  vid_infos=$.extend(true,vid_infos,options);
   if(shortcode){
     //set short to true
     vid_infos['shortcode']=true;
     var parsed_infos=parse_shortcode(shortcode);
     //Merge shortcode
-    vid_infos=$.extend(true,parsed_infos,vid_infos);
+    vid_infos=$.extend(true,vid_infos,parsed_infos);
   } else if(href){
     vid_infos['from']=href;
   }
@@ -139,7 +139,7 @@ function b_embed_req(href,shortcode,options){
        trigger:{
 	 tclass:'trigger',
 	 class_expanded:'vn_emb_exp',
-	 internal_code:"Lancer video",
+	 internal_code:"",
 	 title:"Play"
        },
        messages:{
@@ -161,7 +161,7 @@ function b_embed_req(href,shortcode,options){
        embedder_server:'/embedder-server',
        jsonp:false
      };
-     params = $.extend(true,default_params,params);
+     params = $.extend(true,params,default_params);
      this.each(
        function(){
 	 var vid_address=$(this).attr("href");
@@ -182,6 +182,7 @@ function b_embed_req(href,shortcode,options){
 		 new_dom_trig.setAttribute("class",params.trigger.tclass);
 		 new_dom_trig.setAttribute("title",params.trigger.title),
 		 $(new_dom_trig).data("emb_param",parse_vnparam($(to_embed).attr("vn_emb_param")));
+		 $(new_dom_trig).data("associated_address",vid_address);
 		 new_dom_trig.innerHTML=params.trigger.internal_code;
 		 new_dom.appendChild(new_dom_trig);
 		 $(new_dom).append(old_code);
@@ -189,6 +190,8 @@ function b_embed_req(href,shortcode,options){
 		 //on click
 		 $(new_dom_trig)
 		   .click(function(){
+			    //Reinitialize
+			    var address = $(this).data("associated_address");
 			    // Here we verify if there is a object with specified id where we can
 			    var where_to_insert=$(this).parent();
 			    if(params.embedder_target_id!="" &&
@@ -208,7 +211,7 @@ function b_embed_req(href,shortcode,options){
 					 });
 			    }else{
 			      $(this).addClass(params.trigger.class_expanded);
-			      var data_options=b_embed_req(vid_address,li_shortcode,params.vid_params);
+			      var data_options=b_embed_req(address,li_shortcode,params.vid_params);
 			      //Merge inline parameters into data_options
 			      data_options=$.extend(true,data_options,inline_params);
 			      //Query normally
